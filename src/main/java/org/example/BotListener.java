@@ -1,17 +1,25 @@
 package org.example;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class BotListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
+        User author = event.getAuthor();
+        if (author.isBot()) {
             return;
         }
         if (event.getMessage().getContentRaw().startsWith("!ping")) {
-            //event.getChannel().sendMessage("Pong! " + event.getAuthor().getEffectiveName()).queue(); //answers with pong if ping! is sent
-            event.getChannel().sendMessage("Pong! " + "<@"+event.getAuthor().getId()+">").queue(); //answers with pong if ping! is sent
+            event.getChannel().sendMessage("Pong! " + "<@" + author.getId() + ">").queue(); //answers with pong if ping! is sent
+        } else if (event.getMessage().getContentRaw().startsWith("!hey")) {
+            event.getChannel().sendMessage("Hey! " + "<@" + author.getId() + ">").queue();
+        } else if (event.getMessage().getContentRaw().startsWith("!bye")) {
+            event.getChannel().sendMessage("Bye! " + "<@" + author.getId() + "> " + "https://tenor.com/view/bocchi-bocchi-the-rock-anime-girl-anime-nijika-gif-15470744972741145336").queue();
         }
+
+
     }
 }
