@@ -10,8 +10,8 @@ public class BotListener extends ListenerAdapter {
             return;
         }
         if (event.getMessage().getContentRaw().startsWith("!ping")) {
-            event.getChannel().sendMessage("Pong!").queue();
-
+            //event.getChannel().sendMessage("Pong! " + event.getAuthor().getEffectiveName()).queue(); //answers with pong if ping! is sent
+            event.getChannel().sendMessage("Pong! " + "<@"+event.getAuthor().getId()+">").queue(); //answers with pong if ping! is sent
         }
     }
 }

@@ -16,7 +16,7 @@ public class Main {
 
         try {
             JDABuilder.createDefault(token).enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                    .addEventListeners(new BotListener())
+                    .addEventListeners(new BotListener()) //adds listener
 
 
                     .build(); //connects to discord
