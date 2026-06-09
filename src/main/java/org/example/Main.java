@@ -1,5 +1,7 @@
 package org.example;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
@@ -12,8 +14,15 @@ public class Main {
             return;
         }
 
+        IO.println("[INFO]: Testing Osu! Api Connection... ");
+        OsuApiService osuApiService = new OsuApiService();
+        String accessToken = osuApiService.getAccessToken();
+        IO.println("Osu! Api Connection: " + accessToken);
+        String spielerStats = osuApiService.getUserStats("cluwuwu");
+        IO.println("cluwuwu Stats: " + spielerStats);
         IO.println("Starte den osu! Bot");
-
+        String botcall = osuApiService.FormattedUserStats("cluwuwu");
+        IO.println(botcall);
         try {
             JDABuilder.createDefault(token).enableIntents(GatewayIntent.MESSAGE_CONTENT)
                     .addEventListeners(new BotListener()) //adds listener
@@ -27,13 +36,6 @@ public class Main {
         IO.println("Bot wurde erfolgreich gestarted!");
 
 
-
-
-
-
-
-
-
-
     }
+
 }

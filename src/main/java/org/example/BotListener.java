@@ -6,8 +6,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class BotListener extends ListenerAdapter {
+
+
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        String botcall = new OsuApiService().FormattedUserStats("cluwuwu");
         User author = event.getAuthor(); //author repleaces event.getAuthor() for cleaner code
         if (author.isBot()) { //bot check
             return;
@@ -18,6 +21,8 @@ public class BotListener extends ListenerAdapter {
             event.getChannel().sendMessage("Hey! " + "<@" + author.getId() + ">").queue();
         } else if (event.getMessage().getContentRaw().startsWith("!bye")) {
             event.getChannel().sendMessage("Bye! " + "<@" + author.getId() + "> " + "https://tenor.com/view/bocchi-bocchi-the-rock-anime-girl-anime-nijika-gif-15470744972741145336").queue(); //answer with a gif
+        } else if (event.getMessage().getContentRaw().startsWith("!stats")) {
+            event.getChannel().sendMessage(botcall).queue();
         }
 
 
