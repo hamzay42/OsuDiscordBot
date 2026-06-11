@@ -10,7 +10,6 @@ public class BotListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        String botcall = new OsuApiService().FormattedUserStats("cluwuwu");
         User author = event.getAuthor(); //author repleaces event.getAuthor() for cleaner code
         if (author.isBot()) { //bot check
             return;
@@ -22,7 +21,15 @@ public class BotListener extends ListenerAdapter {
         } else if (event.getMessage().getContentRaw().startsWith("!bye")) {
             event.getChannel().sendMessage("Bye! " + "<@" + author.getId() + "> " + "https://tenor.com/view/bocchi-bocchi-the-rock-anime-girl-anime-nijika-gif-15470744972741145336").queue(); //answer with a gif
         } else if (event.getMessage().getContentRaw().startsWith("!stats")) {
-            event.getChannel().sendMessage(botcall).queue();
+            String[] parts = event.getMessage().getContentRaw().split(" ");
+            if (parts.length == 2) {
+                String botcall = new OsuApiService().FormattedUserStats(parts[1]);
+                event.getChannel().sendMessage(botcall).queue();
+            } else {
+                event.getChannel().sendMessage("Request Player stats with: !stats <username>").queue();
+            }
+
+
         }
 
 

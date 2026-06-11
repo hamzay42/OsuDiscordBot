@@ -18,11 +18,11 @@ public class Main {
         OsuApiService osuApiService = new OsuApiService();
         String accessToken = osuApiService.getAccessToken();
         IO.println("Osu! Api Connection: " + accessToken);
-        String spielerStats = osuApiService.getUserStats("cluwuwu");
-        IO.println("cluwuwu Stats: " + spielerStats);
+        //String spielerStats = osuApiService.getUserStats("caramel7787");
+        //IO.println("caramel7787 Stats: " + spielerStats);
         IO.println("Starte den osu! Bot");
-        String botcall = osuApiService.FormattedUserStats("cluwuwu");
-        IO.println(botcall);
+        //String botcall = osuApiService.FormattedUserStats("caramel7787");
+        //IO.println(botcall);
         try {
             JDABuilder.createDefault(token).enableIntents(GatewayIntent.MESSAGE_CONTENT)
                     .addEventListeners(new BotListener()) //adds listener
