@@ -72,12 +72,12 @@ public class OsuApiService {
         int player_count = jsonObject.get("beatmap_playcounts_count").getAsInt();
 
         EmbedBuilder embed = new EmbedBuilder().setTitle("Player Stats: " + username)
-                .setColor(Color.PINK)
+                .setColor(new Color(255,102,170))
                 .setThumbnail(avatar)
-                .addField("Global Rank",String.valueOf(G_rank),false )
-                .addField("PP",String.valueOf(pp),false )
-                .addField("accuracy", String.valueOf(acc),false)
-                .addField("Beatmap Count",String.valueOf(player_count),false);
+                .addField("Global Rank",String.valueOf(G_rank),true )
+                .addField("PP",String.valueOf(pp),true )
+                .addField("accuracy", String.valueOf(acc),true)
+                .addField("Beatmap Count",String.valueOf(player_count),true);
 
 
 
