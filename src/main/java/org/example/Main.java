@@ -18,8 +18,9 @@ public class Main {
         OsuApiService osuApiService = new OsuApiService();
         String accessToken = osuApiService.getAccessToken();
         IO.println("Osu! Api Connection: " + accessToken);
-        //String spielerStats = osuApiService.getUserStats("caramel7787");
-        //IO.println("caramel7787 Stats: " + spielerStats);
+        String spielerStats = osuApiService.getUserStats("caramel7787");
+        IO.println("caramel7787 Stats: " + spielerStats);
+        //IO.println();
         IO.println("Starte den osu! Bot");
         //String botcall = osuApiService.FormattedUserStats("caramel7787");
         //IO.println(botcall);

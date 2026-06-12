@@ -1,6 +1,7 @@
 package org.example;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -23,8 +24,8 @@ public class BotListener extends ListenerAdapter {
         } else if (event.getMessage().getContentRaw().startsWith("!stats")) {
             String[] parts = event.getMessage().getContentRaw().split(" ");
             if (parts.length == 2) {
-                String botcall = new OsuApiService().FormattedUserStats(parts[1]);
-                event.getChannel().sendMessage(botcall).queue();
+                MessageEmbed botcall = new OsuApiService().FormattedUserStats(parts[1]);
+                event.getChannel().sendMessageEmbeds(botcall).queue();
             } else {
                 event.getChannel().sendMessage("Request Player stats with: !stats <username>").queue();
             }

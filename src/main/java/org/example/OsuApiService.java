@@ -2,8 +2,11 @@ package org.example;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import okhttp3.*;
 
+import java.awt.*;
 import java.io.IOException;
 
 public class OsuApiService {
@@ -57,16 +60,30 @@ public class OsuApiService {
         }
     }
 
-    public String FormattedUserStats(String username) {
+    public MessageEmbed FormattedUserStats(String username) {
         String data_raw = getUserStats(username);
         JsonObject jsonObject = new JsonParser().parse(data_raw).getAsJsonObject();
         JsonObject stats = jsonObject.get("statistics").getAsJsonObject();
 
-        double pp = stats.get("pp").getAsInt();
-        double acc = stats.get("hit_accuracy").getAsInt();
+        double pp = stats.get("pp").getAsDouble();
+        double acc = stats.get("hit_accuracy").getAsDouble();
         int G_rank = stats.get("global_rank").getAsInt();
+        String avatar = jsonObject.get("avatar_url").getAsString();
+        int player_count = jsonObject.get("beatmap_playcounts_count").getAsInt();
 
-        return "Player: " + username + " Rank: " + G_rank + " PP: " + pp + " Accuracy: " + acc + "%";
+        EmbedBuilder embed = new EmbedBuilder().setTitle("Player Stats: " + username)
+                .setColor(Color.PINK)
+                .setThumbnail(avatar)
+                .addField("Global Rank",String.valueOf(G_rank),false )
+                .addField("PP",String.valueOf(pp),false )
+                .addField("accuracy", String.valueOf(acc),false)
+                .addField("Beatmap Count",String.valueOf(player_count),false);
+
+
+
+        return embed.build();
+
+
     }
 
 }
