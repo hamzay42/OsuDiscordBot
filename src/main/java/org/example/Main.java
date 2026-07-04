@@ -15,20 +15,19 @@ public class Main {
         }
 
         IO.println("[INFO]: Testing Osu! Api Connection... ");
+
         OsuApiService osuApiService = new OsuApiService();
-        String accessToken = osuApiService.getAccessToken();
-        IO.println("Osu! Api Connection: " + accessToken);
-        String spielerStats = osuApiService.getUserStats("caramel7787");
-        IO.println("caramel7787 Stats: " + spielerStats);
-        //IO.println();
+
+        CommandManager commandManager = new CommandManager();
+        commandManager.registerCommand(new StatsCommand(osuApiService));
+        commandManager.registerCommand(new PingCommand());
+        commandManager.registerCommand(new RockPaperScissors());
+
         IO.println("Starte den osu! Bot");
-        //String botcall = osuApiService.FormattedUserStats("caramel7787");
-        //IO.println(botcall);
+
         try {
             JDABuilder.createDefault(token).enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                    .addEventListeners(new BotListener()) //adds listener
-
-
+                    .addEventListeners(new BotListener(commandManager)) //adds listener
                     .build(); //connects to discord
         } catch (Exception error) {
             IO.println("[ERROR]: Something went wrong: " + error.getMessage());
