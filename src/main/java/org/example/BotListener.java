@@ -22,12 +22,15 @@ public class BotListener extends ListenerAdapter {
         } else if (event.getMessage().getContentRaw().startsWith("!bye")) {
             event.getChannel().sendMessage("Bye! " + "<@" + author.getId() + "> " + "https://tenor.com/view/bocchi-bocchi-the-rock-anime-girl-anime-nijika-gif-15470744972741145336").queue(); //answer with a gif
         } else if (event.getMessage().getContentRaw().startsWith("!stats")) {
-            String[] parts = event.getMessage().getContentRaw().split(" ");
+            //limit 2 so Usernames with backspace can be tracked
+            String[] parts = event.getMessage().getContentRaw().split(" ",2);
             if (parts.length == 2) {
                 MessageEmbed botcall = new OsuApiService().FormattedUserStats(parts[1]);
                 event.getChannel().sendMessageEmbeds(botcall).queue();
             } else {
+                //ueberfluessig, not getting "player not found message" from getUserstats
                 event.getChannel().sendMessage("Request Player stats with: !stats <username>").queue();
+
             }
 
 

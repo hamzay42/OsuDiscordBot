@@ -63,6 +63,7 @@ public class OsuApiService {
     public MessageEmbed FormattedUserStats(String username) {
         String data_raw = getUserStats(username);
         JsonObject jsonObject = new JsonParser().parse(data_raw).getAsJsonObject();
+        System.out.println("Formatted: "+jsonObject);
         JsonObject stats = jsonObject.get("statistics").getAsJsonObject();
 
         double pp = stats.get("pp").getAsDouble();
