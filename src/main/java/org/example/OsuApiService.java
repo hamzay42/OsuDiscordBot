@@ -1,108 +1,95 @@
 package org.example;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import com.google.gson.Gson;
 import okhttp3.*;
-import com.google.gson.*;
 
-import java.awt.*;
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class OsuApiService {
+
+    private final OkHttpClient httpClient;
+    private final Gson gson;
+    private final String clientId;
+    private final String clientSecret;
+
+    // Cache für das OAuth2-Token
     private String accessToken;
-    private OkHttpClient httpClient;
-    private Gson gson;
 
-
-    public OsuApiService(){
+    public OsuApiService() {
         this.httpClient = new OkHttpClient();
         this.gson = new Gson();
+        this.clientId = System.getenv("OSU_CLIENT_ID");
+        this.clientSecret = System.getenv("OSU_CLIENT_SECRET");
     }
 
-
-    public String getAccessToken() {
-
-        if(accessToken != null){
+    /**
+     * Holt ein neues OAuth2 Access Token von der osu! API oder nutzt das gecachte Token.
+     */
+    private String getAccessToken() {
+        if (this.accessToken != null) {
             return this.accessToken;
         }
 
-        String url = "https://osu.ppy.sh/oauth/token";
-        String osuClientId = System.getenv("OSU_CLIENT_ID");
-        String osuClientSecret = System.getenv("OSU_CLIENT_SECRET");
-
-
-
         RequestBody formBody = new FormBody.Builder()
-                .add("client_id", osuClientId != null ? osuClientId : "")
-                .add("client_secret", osuClientSecret != null ? osuClientSecret : "")
+                .add("client_id", this.clientId)
+                .add("client_secret", this.clientSecret)
                 .add("grant_type", "client_credentials")
                 .add("scope", "public")
                 .build();
 
-        Request request = new Request.Builder().url(url).post(formBody).build();
-
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            if (response.isSuccessful() && response.body() != null) {
-                String jsonAntwort = response.body().string();
-                JsonObject jsonObject = JsonParser.parseString(jsonAntwort).getAsJsonObject();
-                this.accessToken = jsonObject.get("access_token").getAsString();
-                return this.accessToken;
-            } else {
-                return "Server Error: " + response.code();
-            }
-        } catch (Exception e) {
-            return "Network Error: " + e.getMessage();
-        }
-
-
-    }
-
-    public String getUserStats(String username) {
-        if (this.accessToken == null) {
-            getAccessToken();
-        }
-        String url = "https://osu.ppy.sh/api/v2/users/" + username + "/osu";
-
-
-        Request request = new Request.Builder().url(url).header("Authorization", "Bearer " + this.accessToken).build();
-        try (Response response = this.httpClient.newCall(request).execute()) {
-            if (response.isSuccessful() && response.body() != null) {
-                return response.body().string();
-            } else {
-                return "Fehler beim Spieler-Abruf: " + response.code();
-            }
-        } catch (IOException e) {
-            return "Netzwerkfehler: " + e.getMessage();
-        }
-    }
-
-    public MessageEmbed FormattedUserStats(String username) {
-        OsuUser user = getUser(username);
-
-        if (user == null) {
-            return new EmbedBuilder().setTitle("ERROR").
-                setDescription("Username " + username + " not found").
-                setColor(Color.RED)
-            .build();
-        }
-        return  new EmbedBuilder().setTitle("Player Stats: " + username)
-                .setColor(new Color(255,102,170))
-                .setThumbnail(user.avatarUrl())
-                .addField("Global Rank", String.valueOf(user.statistics().globalrank()),true)
-                .addField("PP", String.valueOf(user.statistics().pp()),true)
+        Request request = new Request.Builder()
+                .url("https://osu.ppy.sh/oauth/token")
+                .post(formBody)
                 .build();
 
+        try (Response response = this.httpClient.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                String jsonResponse = response.body().string();
+                Map<?, ?> map = this.gson.fromJson(jsonResponse, Map.class);
+                this.accessToken = (String) map.get("access_token");
+                return this.accessToken;
+            }
+        } catch (IOException e) {
+            System.err.println("[ERROR]: Error fetching osu! API token: " + e.getMessage());
+        }
 
+        return null;
     }
 
+    /**
+     * Synchroner API-Call: Holt die User-Daten aus der osu! v2 API.
+     */
     public OsuUser getUser(String username) {
-        String data_raw = getUserStats(username);
-        if(data_raw.startsWith("{")){
-            Gson gson = new Gson();
-            return gson.fromJson(data_raw,OsuUser.class);
+        String token = getAccessToken();
+        if (token == null) {
+            return null;
         }
+
+        Request request = new Request.Builder()
+                .url("https://osu.ppy.sh/api/v2/users/" + username + "/osu")
+                .addHeader("Authorization", "Bearer " + token)
+                .addHeader("Accept", "application/json")
+                .build();
+
+        try (Response response = this.httpClient.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                String json = response.body().string();
+                return this.gson.fromJson(json, OsuUser.class);
+            }
+        } catch (IOException e) {
+            System.err.println("[ERROR]: Error fetching user stats: " + e.getMessage());
+        }
+
         return null;
+    }
+
+    /**
+     * Asynchroner API-Call: Führt getUser() in einem Background-Thread aus.
+     * Gibt ein CompletableFuture zurück, das den Main/Discord-Thread nicht blockiert.
+     */
+    public CompletableFuture<OsuUser> getUserAsync(String username) {
+        return CompletableFuture.supplyAsync(() -> getUser(username));
     }
 }
