@@ -9,6 +9,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class Main {
     public static void main(String[] args) {
@@ -21,8 +23,14 @@ public class Main {
 
         IO.println("[INFO]: Testing Osu! Api Connection... ");
 
-        OsuApiService osuApiService = new OsuApiService();
 
+        // Cacheing von Accounts um API-Calls zu reduzieren.
+        Cache<String, OsuUser> userCache = Caffeine
+                .newBuilder()
+                .maximumSize(100)
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .build();
+        OsuApiService osuApiService = new OsuApiService(userCache);
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         CommandManager commandManager = new CommandManager(executorService);

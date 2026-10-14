@@ -6,6 +6,7 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import com.github.benmanes.caffeine.cache.Cache;
 
 public class OsuApiService {
 
@@ -16,12 +17,14 @@ public class OsuApiService {
 
     // Cache für das OAuth2-Token
     private String accessToken;
+    private final Cache<String,OsuUser> userCache;
 
-    public OsuApiService() {
+    public OsuApiService(Cache<String, OsuUser> userCache) {
         this.httpClient = new OkHttpClient();
         this.gson = new Gson();
         this.clientId = System.getenv("OSU_CLIENT_ID");
         this.clientSecret = System.getenv("OSU_CLIENT_SECRET");
+        this.userCache = userCache;
     }
 
     /**
